@@ -13,7 +13,7 @@
 		char sexo;
 		float saldo;
 		float comprasTotal;		
-	}cliente;
+	}cliente, usuario;
 	
 	typedef struct veiculo{
 		int cod;
@@ -52,11 +52,14 @@
 	int c = 0; // Define posicao inicial do vetor Cliente
 	int b = 0; // Define posicao inicial do vetor Bike
 	int l = 0; // Define posicao inicial do vetor Locacao
-	int u = 1; // Quantidade de usuarios cadastrados
+	int u = 0; // Quantidade de usuarios cadastrados
 	char usuarioAtual[12];
 	
 void entrarUsuario(login log[10]);
-void novoUsuario(login log[10]);	
+void novoUsuario(login log[10]);
+void novaSenha(login log[10]);
+void consultarUsuario(login log[10]);
+void relatorioUser(locacao loc[1000]);	
 void cadastrarCliente(cliente cli[100]);
 void consultarCliente(cliente cli[100]);
 void relatorioGeralCliente(cliente cli[100]);
@@ -86,10 +89,10 @@ bike[0].cod = 1000;
 loc[0].rg = 0;
 emp.fundos = 0;
 
-strcpy(log[0].user, "admin");
-strcpy(log[0].senha, "123456");
+	// TELA DE INICIO
 
-entrarUsuario(log);
+novoUsuario(log);	//entrar com novo usuario
+entrarUsuario(log);	//fazer login
 	
 	// MENU PRINCIPAL
 	
@@ -126,6 +129,7 @@ entrarUsuario(log);
 					printf("   5 - Inserir Saldo\n");
 					printf("\n   9 - Voltar\n");
 					
+					printf("\n   Usuario atual: %s", usuarioAtual);
 					printf("\n\n   Selecione a opcao desejada: ");
 			
 	        	    scanf("%d", &menuCliente);
@@ -188,6 +192,7 @@ entrarUsuario(log);
 					printf("   4 - Editar\n");
 					printf("\n   9 - Voltar\n");
 					
+					printf("\n   Usuario atual: %s", usuarioAtual);
 					printf("\n\n   Selecione a opcao desejada: ");
 					
 					scanf("%d", &menuVeiculo);
@@ -244,6 +249,7 @@ entrarUsuario(log);
 					printf("   3 - Registrar Devolucao\n");
 					printf("\n   9 - Voltar\n");
 					
+					printf("\n   Usuario atual: %s", usuarioAtual);
 					printf("\n\n   Selecione a opcao desejada: ");
 					
 					scanf("%d", &menuLocacao);
@@ -294,6 +300,7 @@ entrarUsuario(log);
 				printf("\n   Total de veiculos cadastrados: %d", b);
 				printf("\n   Total de locacoes: %d", l);
 				printf("\n   Total de fundos: R$ %.2f", emp.fundos);
+				printf("\n\n   Usuario atual: %s", usuarioAtual);
 				getch();
 				break;
 			}
@@ -303,8 +310,12 @@ entrarUsuario(log);
 					printf("   1 - Novo usuario\n");
 					printf("   2 - Trocar senha\n");
 					printf("   3 - Alterar usuario\n");
-					printf("   4 - Registro de atividades\n");
-					printf("   9 - Voltar");
+					printf("   4 - Consulta de usuarios\n");
+					printf("   5 - Registro de atividades\n");
+					printf("\n   9 - Voltar\n");
+					
+					printf("\n   Usuario atual: %s", usuarioAtual);
+					printf("\n\n   Selecione a opcao desejada: ");
 					scanf("%d", &menuUsuario);
 					
 					system("cls");
@@ -316,12 +327,19 @@ entrarUsuario(log);
 							break;
 						}
 						case 2: {
-							
+							novaSenha(log);
 							break;
 						}
 						case 3: {
-							system("cls");
 							entrarUsuario(log);
+							break;
+						}
+						case 4: {
+							consultarUsuario(log);
+							break;
+						}
+						case 5: {
+							relatorioUser(loc);
 							break;
 						}
 						case 9: {
@@ -463,8 +481,8 @@ void novoUsuario(login log[10]){
 			u++;
 			getchar();	
 		} else {
-			printf("   Senhas nao conferem");
-			printf("   Operacao cancelada");
+			printf("\n   Senhas nao coincidem");
+			printf("\n   Operacao cancelada");
 			getchar();
 		}	
 	} else if (op == 2){
@@ -476,8 +494,106 @@ void novoUsuario(login log[10]){
 		getchar();
 	}
 	getchar();
+	system("cls");
 }
 	
+	//FUNCAO NOVA SENHA
+	
+void novaSenha(login log[10]){
+	
+	int i;
+	char usuario[12], senha[12], novaSenha1[12], novaSenha2[12];
+	
+	printf("\n   ALTERAR SENHA\n");
+	printf("\n   Informe o nome de usuario: ");
+	scanf("%[^\n]", &usuario);
+	fflush(stdin);
+	
+	for (i = 0; i <= u; i++){
+		if(strcmp(log[i].user, usuario) == 0){
+			printf("\n   Informe a senha atual: ");
+			scanf("%[^\n]", &senha);
+			fflush(stdin);
+			
+			if (strcmp(senha, log[i].senha) == 0){
+				printf("\n\n   Informe a nova senha: ");
+				scanf("%[^\n]", &novaSenha1);
+				fflush(stdin);
+				printf("\n   Repita a senha: ");
+				scanf("%[^\n]", &novaSenha2);
+				fflush(stdin);
+				
+				if (strcmp(novaSenha1, novaSenha2) == 0){
+					strcpy(log[i].senha, novaSenha1);
+					printf("\n   Senha alterada com sucesso");
+					getchar();
+				} else{
+					printf("\n   Senhas nao coincidem");
+					printf("\n   Operacao cancelada");
+					getchar();
+				}
+				
+			} else {
+				printf("\n   Senha nao confere");
+				printf("\n   Operacao cancelada");
+				getchar();
+			}
+			break;
+		} else if( i == u){
+			printf("   Usuario inexistente");
+			printf("   Operacao cancelada");
+			getchar();
+		}	
+	}	
+}	
+	
+	// FUNCAO CONSULTAR USUARIOS
+
+void consultarUsuario(login log[10]){
+	
+	int i;
+	
+	printf("\n   USUARIOS CADASTRADOS\n\n");
+	
+	for (i=0; i<u; i++){
+		printf("   %d - %s\n", i+1, log[i].user);		
+	}
+	
+	getchar();
+}	
+	
+	//FUNCAO RELATORIO DE USUARIO
+
+void relatorioUser(locacao loc[1000]){
+	
+	int i, verificador = 0;
+	char usuario[12];
+	
+	printf("\n   RELATORIO DE USUARIO\n");
+	printf("\n   Informe o nome de usuario: ");
+	scanf("%[^\n]", &usuario);
+	fflush(stdin);
+	
+	for (i=0; i<=l; i++){
+		if (strcmp(usuario, loc[i].user) == 0){
+			printf("\n   Registro %d", i+1);
+			printf("\n   Cliente ID: %d\n", loc[i].id);
+			printf("   Cliente: %s\n", loc[i].nome);
+			printf("   CPF: %s\n", loc[i].cpf);
+			printf("   Codigo do Veiculo: %d\n", loc[i].cod);
+			printf("   Marca: %s\n", loc[i].marca);
+			printf("   Dias locados: %d\n", loc[i].dias);
+			printf("   Valor da locacao: %.2f\n", loc[i].valor);
+			verificador = 1;
+		}
+	}
+	
+	if(verificador == 0){
+		printf("\n   Nenhum evento localizado");
+	}
+	getchar();
+}
+
 	//FUNCAO CADASTRAR CLIENTE
 
 void cadastrarCliente(cliente cli[100]){
@@ -567,7 +683,7 @@ void consultarCliente(cliente cli[100]){
 			printf("\n   Informe o CPF do cliente: ");
 			scanf("%[^\n]", &cpf);
 	
-			for(i = 0; i <= c; i++){
+			for(i=0; i<=c; i++){
 				if (strcmp(cpf,cli[i].cpf) == 0){
 					printf("\n   ID: %d\n", cli[i].id);
 					printf("   Nome: %s\n", cli[i].nome);
@@ -603,7 +719,7 @@ void relatorioGeralCliente(cliente cli[100]){
 		printf("\n   Nenhum cliente cadastrado");
 	} else{
 			printf("\n   RELATORIO GERAL\n");
-		for(i = 0; i <= c-1; i++){
+		for(i=0; i<=c-1; i++){
 			printf("\n   ID: %d\n", cli[i].id);
 			printf("   Nome: %s\n", cli[i].nome);
 			printf("   CPF: %s\n", cli[i].cpf);
@@ -919,6 +1035,7 @@ void editVeiculo(veiculo bike[20]){
 float locarVeiculo(cliente cli[100], veiculo bike[20], locacao loc[1000], empresa emp){
 	
 	int i, j, opCli, opBike, dias, opDias;
+	const int diaria = 10;
 	float valorLocacao;
 	
 	printf("\n   REALIZAR LOCACAO\n");
@@ -963,69 +1080,69 @@ float locarVeiculo(cliente cli[100], veiculo bike[20], locacao loc[1000], empres
 				printf("   Status: %s\n", bike[j-1001].status);
 	
 				if(strcmp(bike[j-1001].status ,"LOCADO") == 0){
-				printf("\n   Veiculo indisponivel para locacao");
-				} else {
+					printf("\n   Veiculo indisponivel para locacao");
+				} else{
 					printf("\n   Confirma?\n");
 					printf("   1 - Sim\n");
 					printf("   2 - Nao\n");
 					scanf("%d", &opBike);
 				
 					system("cls");	
-				}
-	
-				if (opBike == 2){
-					printf("\n   Operacao cancelada");
-				} else if(opBike != 1 && opBike != 2){
-					printf("\n   Opcao invalida, tente novamente");
-				} else {
-					printf("\n   Informe a quantidade de dias para locacao: ");
-					scanf("%d", &dias);
 					
-					valorLocacao = dias * 10;
+					if (opBike == 2){
+						printf("\n   Operacao cancelada");
+					} else if(opBike != 1 && opBike != 2){
+						printf("\n   Opcao invalida, tente novamente");
+					} else{
+						printf("\n   Informe a quantidade de dias para locacao: ");
+						scanf("%d", &dias);
 					
-					printf("\n   Locar por %d dias. Valor R$ %.2f. Confirma?\n", dias, valorLocacao);
-					printf("   1 - SIM\n");
-					printf("   2 - NAO\n");
-					scanf("%d", &opDias);
+						valorLocacao = dias * diaria;
 					
-					system("cls");
-					
-					if (opDias == 2){
-					printf("\n   Operacao cancelada");
-					} else if(opDias != 1 && opDias != 2){
-					printf("\n   Opcao invalida, tente novamente");
-					} else {
+						printf("\n   Locar por %d dias. Valor R$ %.2f. Confirma?\n", dias, valorLocacao);
+						printf("   1 - SIM\n");
+						printf("   2 - NAO\n");
+						scanf("%d", &opDias);
 						
-		
-						if (cli[i-1].saldo >= valorLocacao){
-		
-							cli[i-1].saldo = cli[i-1].saldo - valorLocacao; //Ajuste de saldo do cliente
-				
-							emp.fundos += valorLocacao;
-							cli[i-1].comprasTotal += valorLocacao;
-				
-							strcpy(bike[j-1001].status, "LOCADO"); //Alteracao do status do veiculo
-			
-							loc[l].rg = l + 1; 
-							loc[l].id = cli[i-1].id;
-							strcpy(loc[l].nome, cli[i-1].nome);   
-							strcpy(loc[l].cpf, cli[i-1].cpf);     
-							loc[l].idade = cli[i-1].idade;
-							strcpy(loc[l].telefone, cli[i-1].telefone);
-							loc[l].sexo = cli[i-1].sexo;
-							loc[l].cod = bike[j-1001].cod;
-							strcpy(loc[l].marca, bike[j-1001].marca);
-							strcpy(loc[l].tam, bike[j-1001].tam);
-							loc[l].aro = bike[j-1001].aro;
-							loc[l].dias = dias;
-							loc[l].valor = valorLocacao;
-							strcpy(loc[l].user, usuarioAtual);				
-			
-							printf("\n Locacao realizada com sucesso REGISTRO: %d\n", loc[l].rg);
-			
-							l++;	
+						system("cls");
+						
+						if (opDias == 2){
+							printf("\n   Operacao cancelada");
+						} else if(opDias != 1 && opDias != 2){
+							printf("\n   Opcao invalida, tente novamente");
 						} else {
-							printf("\n   Cliente nao possui saldo suficiente");
+							
+			
+							if (cli[i-1].saldo >= valorLocacao){
+			
+								cli[i-1].saldo = cli[i-1].saldo - valorLocacao; //Ajuste de saldo do cliente
+					
+								emp.fundos += valorLocacao;
+								cli[i-1].comprasTotal += valorLocacao;
+				
+								strcpy(bike[j-1001].status, "LOCADO"); //Alteracao do status do veiculo
+				
+								loc[l].rg = l + 1; 
+								loc[l].id = cli[i-1].id;
+								strcpy(loc[l].nome, cli[i-1].nome);   
+								strcpy(loc[l].cpf, cli[i-1].cpf);     
+								loc[l].idade = cli[i-1].idade;
+								strcpy(loc[l].telefone, cli[i-1].telefone);
+								loc[l].sexo = cli[i-1].sexo;
+								loc[l].cod = bike[j-1001].cod;
+								strcpy(loc[l].marca, bike[j-1001].marca);
+								strcpy(loc[l].tam, bike[j-1001].tam);
+								loc[l].aro = bike[j-1001].aro;
+								loc[l].dias = dias;
+								loc[l].valor = valorLocacao;
+								strcpy(loc[l].user, usuarioAtual);				
+			
+								printf("\n Locacao realizada com sucesso REGISTRO: %d\n", loc[l].rg);
+			
+								l++;	
+							} else {
+								printf("\n   Cliente nao possui saldo suficiente");
+							}
 						}
 					}
 				}
@@ -1085,7 +1202,7 @@ void registerDevol(veiculo bike[20], locacao loc[1000]){
 	scanf("%d", &i);
 	
 	do{
-		printf("\n\n   CLIENTE\n\n");
+		printf("\n   CLIENTE\n\n");
 		printf("   ID: %d\n", loc[i-1].id);
 		printf("   Cliente: %s\n", loc[l-1].nome);
 		printf("   CPF: %s\n", loc[l-1].cpf);
@@ -1116,4 +1233,3 @@ void registerDevol(veiculo bike[20], locacao loc[1000]){
 	} while(op != 1 && op != 2);
 	getchar();
 }
-
